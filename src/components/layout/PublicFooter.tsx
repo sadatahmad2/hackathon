@@ -63,7 +63,7 @@ export function PublicFooter() {
           <p>© 2026 Inflow Finance Technologies Inc. Micro-Enterprise Invoice Financing Platform.</p>
           <div className="flex items-center gap-6">
             <span className="hover:text-slate-400 cursor-pointer">Privacy Policy</span>
-            <span className="hover:text-slate-400 cursor-pointer">Terms of Service</span>
+            <Link href="/terms" className="hover:text-slate-400 cursor-pointer">Terms of Service</Link>
             <span className="hover:text-slate-400 cursor-pointer">RBI / Regulatory Disclosures</span>
           </div>
         </div>

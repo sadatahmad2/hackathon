@@ -32,12 +32,14 @@ export default function LoginPage() {
           if (sessionData?.session?.user) {
             const { data: profile } = await supabase
               .from("profiles")
-              .select("role, verification_status")
+              .select("role, verification_status, company_name")
               .eq("id", sessionData.session.user.id)
               .single();
             
             if (profile) {
-              if (profile.verification_status === "PENDING") {
+              if (!profile.company_name) {
+                router.push("/register");
+              } else if (profile.verification_status === "PENDING") {
                 router.push("/pending");
               } else if (profile.role === "SUPPLIER") {
                 router.push("/supplier/dashboard");

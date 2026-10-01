@@ -23,7 +23,7 @@ export default function AuthCallbackPage() {
           // Check if user exists in our custom profiles table
           const { data: profile, error: profileError } = await supabase
             .from("profiles")
-            .select("verification_status, role")
+            .select("verification_status, role, company_name")
             .eq("id", session.user.id)
             .single();
 
@@ -34,6 +34,13 @@ export default function AuthCallbackPage() {
           }
 
           if (profile) {
+            // If the user was created via Google Login, the trigger assigns default SUPPLIER role 
+            // but company_name will be null. We must force them to register to choose their role.
+            if (!profile.company_name) {
+              router.replace("/register");
+              return;
+            }
+
             // User exists, check verification status
             if (profile.verification_status === "VERIFIED") {
               const target = profile.role === "ADMIN" ? "/admin/dashboard" :

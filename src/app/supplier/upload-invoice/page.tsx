@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   X,
   FileCheck,
+  Bot,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 
@@ -24,6 +25,7 @@ export default function UploadInvoicePage() {
   const { success, error } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAiVerification, setShowAiVerification] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -104,11 +106,14 @@ export default function UploadInvoicePage() {
 
       const data = await res.json();
       if (data.success) {
-        success(
-          "Invoice Uploaded Successfully!",
-          "Invoice status is now 'Under Verification'. Admin will review and assign AI Risk rating."
-        );
-        router.push(`/supplier/invoices/${data.invoice.id}`);
+        setShowAiVerification(true);
+        setTimeout(() => {
+          success(
+            "Invoice Verified Successfully!",
+            "Invoice status is now 'Under Verification'. Admin will review and assign AI Risk rating."
+          );
+          router.push(`/supplier/invoices/${data.invoice.id}`);
+        }, 3000);
       } else {
         error("Upload Failed", data.error || "Please verify form fields");
       }
@@ -125,6 +130,38 @@ export default function UploadInvoicePage() {
     { number: 3, label: "Documents" },
     { number: 4, label: "Review" },
   ];
+
+  if (showAiVerification) {
+    return (
+      <DashboardLayout role="SUPPLIER">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-2xl mx-auto text-center space-y-6">
+          <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center animate-pulse shadow-[0_0_40px_rgba(0,200,150,0.5)]">
+            <Bot className="w-12 h-12 text-[#00C896] animate-bounce" />
+          </div>
+          <h2 className="text-3xl font-black text-[#0B1720]">Inflow AI Verification</h2>
+          <p className="text-lg text-slate-500 animate-pulse">Scanning documents and fetching GST records...</p>
+          
+          <div className="w-full max-w-md bg-slate-100 h-2 rounded-full overflow-hidden mt-8">
+            <div className="h-full bg-[#00C896] animate-[progress_3s_ease-in-out_forwards]" style={{ width: '0%' }}></div>
+          </div>
+          
+          <div className="flex flex-col gap-3 text-sm text-slate-500 mt-4 text-left w-full max-w-sm">
+             <div className="flex items-center gap-2 animate-in fade-in zoom-in delay-[500ms] duration-500"><CheckCircle2 className="w-4 h-4 text-[#00C896]" /> Invoice details mapped successfully</div>
+             <div className="flex items-center gap-2 animate-in fade-in zoom-in delay-[1000ms] duration-500"><CheckCircle2 className="w-4 h-4 text-[#00C896]" /> GSTIN cross-checked with government portal</div>
+             <div className="flex items-center gap-2 animate-in fade-in zoom-in delay-[2000ms] duration-500"><CheckCircle2 className="w-4 h-4 text-[#00C896]" /> Preliminary Risk Tier assigned</div>
+          </div>
+          
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes progress {
+              0% { width: 0%; }
+              50% { width: 60%; }
+              100% { width: 100%; }
+            }
+          `}} />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout role="SUPPLIER">

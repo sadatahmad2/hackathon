@@ -71,22 +71,23 @@ export default function RegisterPage() {
     setIsSubmitting(true);
     
     try {
-      // NOTE: pan, businessType, turnover are collected in UI but only core fields inserted to avoid DB schema errors
-      const { error } = await supabase.from("profiles").upsert({
-        id: session.user.id,
-        email: session.user.email,
-        name: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "User",
-        role: role,
-        company_name: role === "ADMIN" ? "Inflow Admin" : formData.companyName,
-        gstin: role === "ADMIN" ? "N/A" : formData.gstin,
-        pan: role === "ADMIN" ? "N/A" : formData.pan,
-        business_type: role === "ADMIN" ? "N/A" : formData.businessType,
-        turnover: role === "ADMIN" ? "N/A" : formData.turnover,
-        avatar_url: session.user.user_metadata?.avatar_url,
-        verification_status: role === "ADMIN" ? "VERIFIED" : "PENDING"
+      // Call API route (uses supabaseAdmin to bypass RLS)
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: session.user.id,
+          email: session.user.email,
+          name: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "User",
+          role: role,
+          companyName: role === "ADMIN" ? "Inflow Admin" : formData.companyName,
+          gstin: role === "ADMIN" ? "N/A" : formData.gstin,
+          investmentPreference: formData.turnover,
+        }),
       });
 
-      if (error) throw error;
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || "Registration failed");
       
       if (role === "ADMIN") {
         router.replace("/admin/dashboard");
@@ -99,6 +100,7 @@ export default function RegisterPage() {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-[#03131A] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">

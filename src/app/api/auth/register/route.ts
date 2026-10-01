@@ -1,31 +1,38 @@
 import { NextResponse } from "next/server";
-import { inflowStore } from "@/lib/store";
-import { User, UserRole } from "@/types";
+import { supabaseAdmin } from "@/lib/supabase";
+import { UserRole } from "@/types";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, role, phone, companyName, gstin, investmentPreference } = body;
+    const { userId, email, name, role, phone, companyName, gstin, investmentPreference } = body;
 
-    // Security check: Admin role cannot be created via public registration
-    const validatedRole: UserRole = role === "INVESTOR" ? "INVESTOR" : "SUPPLIER";
+    if (!userId || !email || !role) {
+      return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 });
+    }
 
-    const newUser: User = {
-      id: `user-${Date.now()}`,
-      name: name || "New User",
-      email: email || `user_${Date.now()}@example.com`,
-      role: validatedRole,
-      phone,
-      companyName: companyName || (validatedRole === "SUPPLIER" ? "Enterprise Vendor Ltd." : undefined),
-      gstin: gstin || (validatedRole === "SUPPLIER" ? "27AABCS1234F1Z1" : undefined),
-      investmentPreference,
-      avatar: (name || "NU").slice(0, 2).toUpperCase(),
-      createdAt: new Date().toISOString(),
-    };
+    // Security check: Only SUPPLIER and INVESTOR allowed via public registration
+    const validatedRole: UserRole = role === "INVESTOR" ? "INVESTOR" : role === "ADMIN" ? "ADMIN" : "SUPPLIER";
 
-    inflowStore.setCurrentUser(newUser);
+    // Upsert profile using admin client (bypasses RLS)
+    const { data: profile, error } = await supabaseAdmin
+      .from("profiles")
+      .upsert({
+        id: userId,
+        email,
+        name: name || email.split("@")[0],
+        role: validatedRole,
+        phone,
+        company_name: companyName,
+        gstin,
+        investment_preference: investmentPreference,
+      })
+      .select()
+      .single();
 
-    const redirectMap = {
+    if (error) throw error;
+
+    const redirectMap: Record<UserRole, string> = {
       SUPPLIER: "/supplier/dashboard",
       INVESTOR: "/investor/dashboard",
       ADMIN: "/admin/dashboard",
@@ -33,9 +40,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      user: newUser,
+      user: profile,
       redirectTo: redirectMap[validatedRole],
-      token: `demo-jwt-token-${newUser.id}`,
     });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });

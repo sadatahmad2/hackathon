@@ -397,7 +397,12 @@ export default function SupplierInvoiceDetailsPage({
                     <span className="text-[11px] text-slate-400">1.4 MB • Digitally signed & verified</span>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" leftIcon={<Download className="w-3.5 h-3.5 mr-1" />}>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  leftIcon={<Download className="w-3.5 h-3.5 mr-1" />}
+                  onClick={() => info("Download Started", "This is a demo environment. No physical file is attached.")}
+                >
                   Download
                 </Button>
               </div>
@@ -410,7 +415,12 @@ export default function SupplierInvoiceDetailsPage({
                     <span className="text-[11px] text-slate-400">840 KB • Buyer warehouse seal verified</span>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" leftIcon={<Download className="w-3.5 h-3.5 mr-1" />}>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  leftIcon={<Download className="w-3.5 h-3.5 mr-1" />}
+                  onClick={() => info("Download Started", "This is a demo environment. No physical file is attached.")}
+                >
                   Download
                 </Button>
               </div>

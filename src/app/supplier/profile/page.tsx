@@ -20,7 +20,7 @@ export default function SupplierProfilePage() {
     name: "",
     companyName: "",
     gstin: "",
-    phone: "",
+    investmentPreference: "",
     verification_status: "",
   });
 
@@ -28,7 +28,7 @@ export default function SupplierProfilePage() {
     name: "",
     companyName: "",
     gstin: "",
-    phone: "",
+    investmentPreference: "",
   });
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function SupplierProfilePage() {
       try {
         const { data, error } = await supabase
           .from("profiles")
-          .select("name, company_name, gstin, phone, verification_status")
+          .select("name, company_name, gstin, investment_preference, verification_status")
           .eq("id", session.user.id)
           .single();
           
@@ -48,7 +48,7 @@ export default function SupplierProfilePage() {
             name: data.name || "",
             companyName: data.company_name || "",
             gstin: data.gstin || "",
-            phone: data.phone || "",
+            investmentPreference: data.investment_preference || "",
             verification_status: data.verification_status || "",
           };
           setProfile(fetchedProfile);
@@ -77,7 +77,7 @@ export default function SupplierProfilePage() {
           name: formData.name,
           companyName: formData.companyName,
           gstin: formData.gstin,
-          phone: formData.phone,
+          investmentPreference: formData.investmentPreference,
         }),
       });
       
@@ -89,7 +89,7 @@ export default function SupplierProfilePage() {
         name: formData.name,
         companyName: formData.companyName,
         gstin: formData.gstin,
-        phone: formData.phone,
+        investmentPreference: formData.investmentPreference,
       });
       setIsEditing(false);
       success("Profile Updated", "Your profile details have been saved.");
@@ -204,16 +204,21 @@ export default function SupplierProfilePage() {
             </div>
 
             <div className="p-4 bg-slate-50 rounded-xl">
-              <span className="text-slate-500 block mb-1 text-xs">Phone Number</span>
+              <span className="text-slate-500 block mb-1 text-xs">Annual Turnover</span>
               {isEditing ? (
-                <input 
-                  type="text" 
-                  value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                <select 
+                  value={formData.investmentPreference}
+                  onChange={(e) => setFormData({...formData, investmentPreference: e.target.value})}
                   className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 focus:outline-none focus:border-emerald-500"
-                />
+                >
+                  <option value="">Select range...</option>
+                  <option value="< 1 Cr">Less than 1 Cr</option>
+                  <option value="1-5 Cr">1 Cr - 5 Cr</option>
+                  <option value="5-20 Cr">5 Cr - 20 Cr</option>
+                  <option value="> 20 Cr">Above 20 Cr</option>
+                </select>
               ) : (
-                <span className="font-semibold text-slate-900">{profile.phone || "Not provided"}</span>
+                <span className="font-semibold text-slate-900">{profile.investmentPreference || "Not provided"}</span>
               )}
             </div>
           </div>

@@ -17,7 +17,6 @@ export async function PUT(request: Request) {
         company_name: companyName,
         gstin,
         investment_preference: investmentPreference,
-        phone,
       })
       .eq("id", userId)
       .select()

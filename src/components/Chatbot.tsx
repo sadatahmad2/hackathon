@@ -54,7 +54,8 @@ export default function Chatbot() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get response');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to get response: ${response.status}`);
       }
 
       const data = await response.json();
@@ -64,12 +65,13 @@ export default function Chatbot() {
         role: 'model',
         content: data.reply
       }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Chat error:', error);
+      const errorMessage = error.message || 'Sorry, I encountered an error. Please try again.';
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'model',
-        content: 'Sorry, I encountered an error. Please try again.'
+        content: `Error: ${errorMessage}`
       }]);
     } finally {
       setIsLoading(false);

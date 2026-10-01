@@ -4,20 +4,27 @@ import { supabaseAdmin } from "@/lib/supabase";
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const { userId, name, companyName, gstin, investmentPreference, phone } = body;
+    const { userId, name, companyName, gstin, investmentPreference, role } = body;
 
     if (!userId) {
       return NextResponse.json({ success: false, error: "Missing userId" }, { status: 400 });
     }
 
+    const updateData: Record<string, any> = {
+      name,
+      company_name: companyName,
+      gstin,
+      investment_preference: investmentPreference,
+    };
+
+    // Only allow switching between SUPPLIER and INVESTOR (not ADMIN)
+    if (role === "SUPPLIER" || role === "INVESTOR") {
+      updateData.role = role;
+    }
+
     const { data, error } = await supabaseAdmin
       .from("profiles")
-      .update({
-        name,
-        company_name: companyName,
-        gstin,
-        investment_preference: investmentPreference,
-      })
+      .update(updateData)
       .eq("id", userId)
       .select()
       .single();

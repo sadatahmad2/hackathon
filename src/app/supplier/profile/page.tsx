@@ -1,16 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { Loader2, Save, X } from "lucide-react";
+import { Loader2, Save, X, Store, TrendingUp } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 
 export default function SupplierProfilePage() {
   const { session } = useAuth();
+  const router = useRouter();
   const { success, error: showError } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,6 +24,7 @@ export default function SupplierProfilePage() {
     gstin: "",
     investmentPreference: "",
     verification_status: "",
+    role: "SUPPLIER",
   });
 
   const [formData, setFormData] = useState({
@@ -29,6 +32,7 @@ export default function SupplierProfilePage() {
     companyName: "",
     gstin: "",
     investmentPreference: "",
+    role: "SUPPLIER",
   });
 
   useEffect(() => {
@@ -37,7 +41,7 @@ export default function SupplierProfilePage() {
       try {
         const { data, error } = await supabase
           .from("profiles")
-          .select("name, company_name, gstin, investment_preference, verification_status")
+          .select("name, company_name, gstin, investment_preference, verification_status, role")
           .eq("id", session.user.id)
           .single();
           
@@ -50,6 +54,7 @@ export default function SupplierProfilePage() {
             gstin: data.gstin || "",
             investmentPreference: data.investment_preference || "",
             verification_status: data.verification_status || "",
+            role: data.role || "SUPPLIER",
           };
           setProfile(fetchedProfile);
           setFormData(fetchedProfile);
@@ -78,21 +83,24 @@ export default function SupplierProfilePage() {
           companyName: formData.companyName,
           gstin: formData.gstin,
           investmentPreference: formData.investmentPreference,
+          role: formData.role,
         }),
       });
       
       const data = await res.json();
       if (!data.success) throw new Error(data.error);
       
-      setProfile({
-        ...profile,
-        name: formData.name,
-        companyName: formData.companyName,
-        gstin: formData.gstin,
-        investmentPreference: formData.investmentPreference,
-      });
+      setProfile({ ...profile, ...formData });
       setIsEditing(false);
       success("Profile Updated", "Your profile details have been saved.");
+
+      // If role changed, redirect to new dashboard
+      if (formData.role !== profile.role) {
+        setTimeout(() => {
+          if (formData.role === "INVESTOR") router.replace("/investor/dashboard");
+          else router.replace("/supplier/dashboard");
+        }, 1200);
+      }
     } catch (err: any) {
       showError("Update Failed", err.message);
     } finally {
@@ -140,7 +148,7 @@ export default function SupplierProfilePage() {
                   </h2>
                   {profile.verification_status === "VERIFIED" && <Badge variant="verified" size="sm" />}
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">Role: Supplier</p>
+                <p className="text-xs text-slate-500 mt-0.5">Role: {profile.role === "INVESTOR" ? "Investor" : "Supplier"}</p>
               </div>
             </div>
 
@@ -221,6 +229,59 @@ export default function SupplierProfilePage() {
                 <span className="font-semibold text-slate-900">{profile.investmentPreference || "Not provided"}</span>
               )}
             </div>
+
+            {/* Role Selection - full width */}
+            {isEditing && (
+              <div className="sm:col-span-2 p-4 bg-slate-50 rounded-xl">
+                <span className="text-slate-500 block mb-3 text-xs font-medium">Account Type</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({...formData, role: "SUPPLIER"})}
+                    className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                      formData.role === "SUPPLIER"
+                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                        : "border-slate-200 bg-white text-slate-500 hover:border-emerald-300"
+                    }`}
+                  >
+                    <Store className="w-5 h-5" />
+                    <div className="text-left">
+                      <p className="font-bold text-sm">Supplier</p>
+                      <p className="text-xs opacity-70">Upload & finance invoices</p>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({...formData, role: "INVESTOR"})}
+                    className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                      formData.role === "INVESTOR"
+                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                        : "border-slate-200 bg-white text-slate-500 hover:border-blue-300"
+                    }`}
+                  >
+                    <TrendingUp className="w-5 h-5" />
+                    <div className="text-left">
+                      <p className="font-bold text-sm">Investor</p>
+                      <p className="text-xs opacity-70">Bid & earn returns</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Show role when not editing */}
+            {!isEditing && (
+              <div className="sm:col-span-2 p-4 bg-slate-50 rounded-xl">
+                <span className="text-slate-500 block mb-1 text-xs">Account Type</span>
+                <div className="flex items-center gap-2 mt-1">
+                  {profile.role === "INVESTOR" ? (
+                    <><TrendingUp className="w-4 h-4 text-blue-600" /><span className="font-semibold text-slate-900">Investor</span></>
+                  ) : (
+                    <><Store className="w-4 h-4 text-emerald-600" /><span className="font-semibold text-slate-900">Supplier</span></>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

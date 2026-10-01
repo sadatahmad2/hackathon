@@ -20,8 +20,10 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function SupplierDashboardPage() {
+  const { user } = useAuth();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -36,15 +38,25 @@ export default function SupplierDashboardPage() {
   const [recentActivities, setRecentActivities] = useState<{id: string, title: string, time: string, icon: any, bg: string}[]>([]);
 
   useEffect(() => {
-    fetch("/api/invoices")
+    if (!user?.id) return;
+    fetch(`/api/invoices?supplierId=${user.id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.invoices) {
-          setInvoices(data.invoices);
+          const invs: Invoice[] = data.invoices;
+          setInvoices(invs);
+          setStats({
+            totalInvoices: invs.length,
+            verified: invs.filter((i) => i.status === "Verified").length,
+            pending: invs.filter((i) => i.status === "Pending").length,
+            fundsReceived: invs
+              .filter((i) => i.status === "Funded" || i.status === "Repaid")
+              .reduce((sum, i) => sum + (i.bestBidAmount || 0), 0),
+          });
         }
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [user?.id]);
 
   return (
     <DashboardLayout role="SUPPLIER">

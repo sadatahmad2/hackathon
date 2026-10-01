@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { inflowStore } from "@/lib/store";
+import { supabase } from "@/lib/supabase";
 
 export async function POST(
   request: Request,
@@ -7,16 +7,25 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const invoice = await inflowStore.verifyInvoice(id, false);
 
-    if (!invoice) {
-      return NextResponse.json({ success: false, error: "Invoice not found" }, { status: 404 });
+    const { data: updatedInv, error: updateError } = await supabase
+      .from("invoices")
+      .update({ status: "Rejected" })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (updateError || !updatedInv) {
+      return NextResponse.json(
+        { success: false, error: updateError?.message || "Invoice not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({
       success: true,
       message: "Invoice rejected.",
-      invoice,
+      invoice: updatedInv,
     });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

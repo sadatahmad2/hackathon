@@ -22,6 +22,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
 
   // If already authenticated, check profile and redirect
   useEffect(() => {
@@ -93,7 +94,27 @@ export default function LoginPage() {
           showError("Login failed", "Invalid Admin ID or Password");
         }
       } else {
-        const { data: authData, error } = await supabase.auth.signInWithPassword({
+        if (isSignUp) {
+          const { data: authData, error } = await supabase.auth.signUp({
+            email,
+            password,
+          });
+          if (error) throw error;
+          
+          if (authData.user) {
+            // Upsert profile with selected role
+            await supabase.from("profiles").upsert({
+              id: authData.user.id,
+              email: authData.user.email,
+              role: role,
+              verification_status: "PENDING"
+            }, { onConflict: "id" });
+          }
+          
+          success("Account Created!", "Welcome to Inflow.");
+          router.push("/register");
+        } else {
+          const { data: authData, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -153,10 +174,10 @@ export default function LoginPage() {
           {/* Heading */}
           <div className="text-center mb-8">
             <h2 className="text-2xl font-extrabold text-white tracking-tight">
-              Welcome Back
+              {isSignUp ? "Create an Account" : "Welcome Back"}
             </h2>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              Login to your account to continue
+              {isSignUp ? "Sign up to get started" : "Login to your account to continue"}
             </p>
           </div>
 
@@ -196,7 +217,7 @@ export default function LoginPage() {
           <div className="my-6 flex items-center justify-between text-xs text-slate-500">
             <span className="w-full border-t border-white/10" />
             <span className="px-3 uppercase font-semibold text-[11px] tracking-wider shrink-0 text-slate-500">
-              OR LOGIN WITH EMAIL
+              OR {isSignUp ? "SIGN UP" : "LOGIN"} WITH EMAIL
             </span>
             <span className="w-full border-t border-white/10" />
           </div>
@@ -270,8 +291,19 @@ export default function LoginPage() {
               isLoading={isLoading}
               className="w-full rounded-xl py-3 font-bold text-white shadow-lg shadow-emerald-500/20 mt-2"
             >
-              Login as {role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()}
+              {isSignUp ? "Sign Up as" : "Login as"} {role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()}
             </Button>
+            
+            <div className="text-center mt-4 text-sm text-slate-400">
+              {isSignUp ? "Already have an account? " : "Don't have an account? "}
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-emerald-500 font-semibold hover:text-emerald-400 transition-colors"
+              >
+                {isSignUp ? "Login" : "Sign Up"}
+              </button>
+            </div>
           </form>
 
           {/* Footer link */}

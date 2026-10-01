@@ -51,6 +51,21 @@ export function DashboardLayout({ role, children }: DashboardLayoutProps) {
   const [isSwitchRoleOpen, setIsSwitchRoleOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      const q = encodeURIComponent(searchQuery.trim());
+      if (role === "INVESTOR") {
+        router.push(`/investor/marketplace?q=${q}`);
+      } else if (role === "SUPPLIER") {
+        router.push(`/supplier/invoices?q=${q}`);
+      } else {
+        router.push(`/admin/users?q=${q}`);
+      }
+      setSearchQuery("");
+    }
+  };
 
   // Supplier Nav Items
   const supplierNav = [
@@ -195,12 +210,15 @@ export function DashboardLayout({ role, children }: DashboardLayoutProps) {
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
                 placeholder={
                   role === "SUPPLIER"
-                    ? "Search invoices, buyers..."
+                    ? "Search invoices, buyers... (Press Enter)"
                     : role === "INVESTOR"
-                    ? "Search invoices, companies, industries..."
-                    : "Search users, invoices, transactions..."
+                    ? "Search invoices, companies... (Press Enter)"
+                    : "Search users, invoices... (Press Enter)"
                 }
                 className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50/80 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00C896]/40 focus:border-[#00C896] placeholder:text-slate-400 transition-all"
               />

@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -17,9 +18,10 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-export default function InvestorMarketplacePage() {
+function MarketplaceContent() {
+  const searchParams = useSearchParams();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "");
   const [selectedIndustry, setSelectedIndustry] = useState("ALL");
   const [selectedRisk, setSelectedRisk] = useState("ALL");
   const [selectedTenure, setSelectedTenure] = useState("ALL");
@@ -211,5 +213,13 @@ export default function InvestorMarketplacePage() {
         </div>
       </div>
     </DashboardLayout>
+  );
+}
+
+export default function InvestorMarketplacePage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-slate-400">Loading marketplace...</div>}>
+      <MarketplaceContent />
+    </Suspense>
   );
 }

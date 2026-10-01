@@ -14,8 +14,15 @@ export default function AdminUsersPage() {
   const { success, error } = useToast();
 
   const fetchUsers = async () => {
-    const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
-    if (data) setUsers(data);
+    try {
+      const res = await fetch("/api/admin/users");
+      const data = await res.json();
+      if (data.success) {
+        setUsers(data.users);
+      }
+    } catch (err) {
+      console.error("Failed to fetch users", err);
+    }
     setLoading(false);
   };
 
@@ -25,11 +32,14 @@ export default function AdminUsersPage() {
 
   const handleApproveUser = async (userId: string) => {
     try {
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ verification_status: "VERIFIED" })
-        .eq("id", userId);
-      if (updateError) throw updateError;
+      const res = await fetch("/api/admin/users/approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, status: "VERIFIED" }),
+      });
+      const data = await res.json();
+      
+      if (!data.success) throw new Error(data.error);
       
       success("User Approved", "The user can now access their dashboard.");
       fetchUsers();

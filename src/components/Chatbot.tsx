@@ -83,7 +83,7 @@ export default function Chatbot() {
           {/* Header */}
           <div className="bg-gradient-to-r from-emerald-600 to-[#00C896] p-4 text-white flex justify-between items-center shadow-md">
             <div className="flex items-center gap-2">
-              <Sparkles size={24} className="text-emerald-100" />
+              <Bot size={24} className="text-emerald-100" />
               <h3 className="font-semibold text-lg">Inflow AI</h3>
             </div>
             <button 
@@ -104,7 +104,7 @@ export default function Chatbot() {
               >
                 {msg.role === 'model' && (
                   <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-                    <Sparkles size={16} className="text-emerald-600 dark:text-emerald-400" />
+                    <Bot size={16} className="text-emerald-600 dark:text-emerald-400" />
                   </div>
                 )}
                 
@@ -129,7 +129,7 @@ export default function Chatbot() {
             {isLoading && (
               <div className="flex gap-3 justify-start">
                 <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-                  <Sparkles size={16} className="text-emerald-600 dark:text-emerald-400" />
+                  <Bot size={16} className="text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div className="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 p-4 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-1">
                   <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
@@ -172,7 +172,7 @@ export default function Chatbot() {
         }`}
         aria-label="Toggle AI chat"
       >
-        {isOpen ? <X size={24} /> : <Sparkles size={24} />}
+        {isOpen ? <X size={24} /> : <Bot size={24} />}
       </button>
     </div>
   );

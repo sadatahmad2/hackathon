@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+:root {
+  --navy: #03131A;
+  --navy-surface: #061B24;
+  --navy-border: #0F2D3B;
+  --deep-green: #006B5B;
+  --emerald: #00C896;
+  --mint: #35E6B0;
+  --light-bg: #F5F8F8;
+  --surface: #FFFFFF;
+  --text-main: #0B1720;
+  --text-muted: #64748B;
+  --border-light: #E2E8F0;
+  --border-subtle: #EDF2F4;
+}
+
+@theme {
+  --color-inflow-navy: #03131A;
+  --color-inflow-navy-surface: #061B24;
+  --color-inflow-navy-border: #0F2D3B;
+  --color-inflow-deep: #006B5B;
+  --color-inflow-emerald: #00C896;
+  --color-inflow-mint: #35E6B0;
+  --color-inflow-bg: #F5F8F8;
+  --color-inflow-text: #0B1720;
+  --color-inflow-muted: #64748B;
+}
+
+body {
+  background-color: var(--light-bg);
+  color: var(--text-main);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Glassmorphism helpers */
+.glass-dark {
+  background: rgba(3, 19, 26, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.glass-emerald-card {
+  background: linear-gradient(135deg, rgba(0, 107, 91, 0.2) 0%, rgba(0, 200, 150, 0.15) 100%);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 200, 150, 0.35);
+}
+
+.emerald-glow {
+  box-shadow: 0 0 25px -3px rgba(0, 200, 150, 0.35);
+}
+
+.emerald-glow-sm {
+  box-shadow: 0 0 15px -2px rgba(0, 200, 150, 0.25);
+}
+
+/* Shimmer animation for loading and highlight */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}

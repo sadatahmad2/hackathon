@@ -1,0 +1,21 @@
+^Dnode:fs:436
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ECANCELED: operation canceled, read
+    at Object.readFileSync (node:fs:436:20)
+    at defaultLoadImpl (node:internal/modules/cjs/loader:1198:17)
+    at loadSource (node:internal/modules/cjs/loader:1899:20)
+    at Module._extensions..js (node:internal/modules/cjs/loader:2006:44)
+    at Module.load (node:internal/modules/cjs/loader:1596:32)
+    at Module._load (node:internal/modules/cjs/loader:1398:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1619:12)
+    at mod.require (/Users/apple/Desktop/Inflow/node_modules/next/dist/server/require-hook.js:79:28)
+    at require (node:internal/modules/helpers:191:16) {
+  errno: -89,
+  code: 'ECANCELED',
+  syscall: 'read'
+}
+
+Node.js v26.3.0

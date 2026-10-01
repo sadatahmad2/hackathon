@@ -1,0 +1,18 @@
+<svg width="180" height="48" viewBox="0 0 180 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoPrimaryWhite" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#35E6B0" />
+      <stop offset="100%" stopColor="#00C896" />
+    </linearGradient>
+    <linearGradient id="logoAccentWhite" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#00C896" />
+      <stop offset="100%" stopColor="#006B5B" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(4, 4)">
+    <path d="M6 8C6 5.79086 7.79086 4 10 4H26.5C29.5376 4 32 6.46243 32 9.5C32 12.5376 29.5376 15 26.5 15H14C11.7909 15 10 16.7909 10 19V19C10 21.2091 8.2091 23 6 23V8Z" fill="url(#logoPrimaryWhite)" />
+    <path d="M14 21C14 18.7909 15.7909 17 18 17H27.5C29.9853 17 32 19.0147 32 21.5C32 23.9853 29.9853 26 27.5 26H16C14.8954 26 14 25.1046 14 24V21Z" fill="url(#logoAccentWhite)" />
+    <circle cx="26" cy="31" r="3.5" fill="#35E6B0" />
+  </g>
+  <text x="50" y="32" font-family="Inter, -apple-system, sans-serif" font-size="26" font-weight="700" fill="#FFFFFF" letter-spacing="-0.5">Inflow</text>
+</svg>

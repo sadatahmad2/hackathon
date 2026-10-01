@@ -24,7 +24,6 @@ import {
 } from "lucide-react";
 
 export default function LandingPage() {
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#03131A] text-white selection:bg-[#00C896] selection:text-black">
@@ -71,16 +70,6 @@ export default function LandingPage() {
                     Get Started
                   </Button>
                 </Link>
-
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setIsVideoModalOpen(true)}
-                  leftIcon={<Play className="w-4 h-4 mr-1 text-[#00C896] fill-[#00C896]" />}
-                  className="px-6 rounded-xl bg-slate-900/80 border-slate-700 text-white hover:bg-slate-800"
-                >
-                  Watch Demo
-                </Button>
               </div>
 
               {/* Feature Highlights Pill */}
@@ -357,33 +346,6 @@ export default function LandingPage() {
 
       <PublicFooter />
 
-      {/* Demo Video Modal */}
-      <Modal
-        isOpen={isVideoModalOpen}
-        onClose={() => setIsVideoModalOpen(false)}
-        title="Inflow Platform Walkthrough"
-        subtitle="Micro-Enterprise Invoice Financing Simulation"
-        maxWidth="lg"
-      >
-        <div className="space-y-4 text-slate-700 text-sm">
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-            <h4 className="font-bold text-[#0B1720] mb-1">Standard Platform Workflow:</h4>
-            <ol className="list-decimal list-inside space-y-2 text-xs text-slate-600">
-              <li><strong>Supplier uploads invoice</strong>: GST tax invoice and delivery challan.</li>
-              <li><strong>Admin verifies</strong>: checks documents & assigns risk tier.</li>
-              <li><strong>Marketplace auction</strong>: Investors place competitive bids.</li>
-              <li><strong>Supplier accepts bid</strong>: Escrow is activated and instant payout occurs.</li>
-              <li><strong>Day-90 Repayment</strong>: Corporate buyer repays into Escrow, yield settled to investor.</li>
-            </ol>
-          </div>
-
-          <div className="flex items-center justify-end gap-3 pt-3">
-            <Button variant="primary" onClick={() => { setIsVideoModalOpen(false); }}>
-              Explore Live App
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 }

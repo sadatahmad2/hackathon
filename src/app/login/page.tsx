@@ -91,13 +91,27 @@ export default function LoginPage() {
           showError("Login failed", "Invalid Admin ID or Password");
         }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data: authData, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
         
+        if (authData.user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", authData.user.id)
+            .single();
+
+          if (profile && profile.role !== role) {
+            await supabase.auth.signOut();
+            throw new Error(`This email is registered as a ${profile.role}. Please select the ${profile.role} tab to login.`);
+          }
+        }
+        
         success("Welcome Back!", "Logged in successfully.");
+        // Note: The useEffect checkProfileAndRedirect will handle the actual routing based on verification_status
         router.push("/pending");
       }
     } catch (err: any) {

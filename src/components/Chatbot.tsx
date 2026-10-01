@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, Loader2, Bot, User } from 'lucide-react';
+import { MessageSquare, X, Send, Loader2, Bot, User, Sparkles } from 'lucide-react';
 
 type Message = {
   id: string;
@@ -12,7 +12,7 @@ type Message = {
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { id: '1', role: 'model', content: 'Hi there! How can I help you today?' }
+    { id: '1', role: 'model', content: 'Hi! I am the Inflow AI Assistant. How can I help you today?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -81,10 +81,10 @@ export default function Chatbot() {
       {isOpen && (
         <div className="mb-4 w-80 sm:w-96 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[500px] max-h-[80vh] transition-all duration-300 transform origin-bottom-right">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white flex justify-between items-center shadow-md">
+          <div className="bg-gradient-to-r from-emerald-600 to-[#00C896] p-4 text-white flex justify-between items-center shadow-md">
             <div className="flex items-center gap-2">
-              <Bot size={24} className="text-blue-100" />
-              <h3 className="font-semibold text-lg">AI Assistant</h3>
+              <Sparkles size={24} className="text-emerald-100" />
+              <h3 className="font-semibold text-lg">Inflow AI</h3>
             </div>
             <button 
               onClick={() => setIsOpen(false)}
@@ -96,31 +96,31 @@ export default function Chatbot() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-950/50">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-gray-950/50">
             {messages.map((msg) => (
               <div 
                 key={msg.id} 
                 className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.role === 'model' && (
-                  <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-                    <Bot size={18} className="text-blue-600 dark:text-blue-400" />
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                    <Sparkles size={16} className="text-emerald-600 dark:text-emerald-400" />
                   </div>
                 )}
                 
                 <div 
                   className={`max-w-[75%] p-3 rounded-2xl text-sm shadow-sm ${
                     msg.role === 'user' 
-                      ? 'bg-blue-600 text-white rounded-tr-sm' 
-                      : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700 rounded-tl-sm'
+                      ? 'bg-slate-800 text-white rounded-tr-sm' 
+                      : 'bg-white dark:bg-gray-800 text-slate-800 dark:text-gray-200 border border-slate-200 dark:border-gray-700 rounded-tl-sm'
                   }`}
                 >
                   <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                 </div>
                 
                 {msg.role === 'user' && (
-                  <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center shrink-0">
-                    <User size={18} className="text-gray-600 dark:text-gray-300" />
+                  <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-gray-700 flex items-center justify-center shrink-0">
+                    <User size={18} className="text-slate-600 dark:text-gray-300" />
                   </div>
                 )}
               </div>
@@ -128,13 +128,13 @@ export default function Chatbot() {
             
             {isLoading && (
               <div className="flex gap-3 justify-start">
-                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-                  <Bot size={18} className="text-blue-600 dark:text-blue-400" />
+                <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                  <Sparkles size={16} className="text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-4 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-1">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                <div className="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 p-4 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-1">
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                 </div>
               </div>
             )}
@@ -142,20 +142,20 @@ export default function Chatbot() {
           </div>
 
           {/* Input */}
-          <div className="p-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+          <div className="p-3 bg-white dark:bg-gray-900 border-t border-slate-200 dark:border-gray-800">
             <form onSubmit={handleSubmit} className="relative flex items-center">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask me anything..."
-                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 rounded-full py-3 pl-4 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow border border-transparent focus:bg-white dark:focus:bg-gray-900"
+                placeholder="Ask AI anything..."
+                className="w-full bg-slate-100 dark:bg-gray-800 text-slate-900 dark:text-gray-100 placeholder-slate-500 dark:placeholder-gray-400 rounded-full py-3 pl-4 pr-12 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-shadow border border-transparent focus:bg-white dark:focus:bg-gray-900"
                 disabled={isLoading}
               />
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="absolute right-1.5 p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white rounded-full transition-colors disabled:cursor-not-allowed"
+                className="absolute right-1.5 p-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 dark:disabled:bg-gray-600 text-white rounded-full transition-colors disabled:cursor-not-allowed"
               >
                 {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} className="ml-0.5" />}
               </button>
@@ -168,11 +168,11 @@ export default function Chatbot() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`w-14 h-14 rounded-full flex items-center justify-center text-white shadow-xl transition-all duration-300 transform hover:scale-105 ${
-          isOpen ? 'bg-gray-800 dark:bg-gray-700 rotate-90 scale-90' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-blue-500/50'
+          isOpen ? 'bg-slate-800 dark:bg-gray-700 rotate-90 scale-90' : 'bg-gradient-to-tr from-emerald-600 to-[#00C896] hover:shadow-emerald-500/50'
         }`}
-        aria-label="Toggle chat"
+        aria-label="Toggle AI chat"
       >
-        {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
+        {isOpen ? <X size={24} /> : <Sparkles size={24} />}
       </button>
     </div>
   );

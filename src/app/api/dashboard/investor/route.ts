@@ -1,32 +1,33 @@
 import { NextResponse } from "next/server";
-import { inflowStore } from "@/lib/store";
+import { supabase } from "@/lib/supabase";
 
-export async function GET() {
-  const invoices = inflowStore.getInvoices();
-  const marketplaceInvoices = invoices.filter((i) => i.status === "Verified" || i.status === "Active Auction");
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const investorId = searchParams.get("investorId");
 
-  return NextResponse.json({
-    success: true,
-    data: {
-      metrics: {
-        totalInvested: 18500000, // ₹1,85,00,000
-        expectedReturns: 1240000, // ₹12,40,000
-        activeInvestments: 24,
-        repaymentRate: 98.2,
-      },
-      portfolioBreakdown: [
-        { name: "Manufacturing", value: 45, color: "#00C896" },
-        { name: "Retail & Electronics", value: 25, color: "#3B82F6" },
-        { name: "Infrastructure", value: 18, color: "#8B5CF6" },
-        { name: "Export & Trade", value: 12, color: "#F59E0B" },
-      ],
-      riskBreakdown: [
-        { name: "AAA", percentage: 50, color: "#00C896" },
-        { name: "AA", percentage: 30, color: "#3B82F6" },
-        { name: "A", percentage: 15, color: "#F59E0B" },
-        { name: "BBB", percentage: 5, color: "#EC4899" },
-      ],
-      marketplace: marketplaceInvoices,
-    },
-  });
+  let query = supabase
+    .from("bids")
+    .select("*, invoices(invoice_number, buyer_name, amount, due_date, status)")
+    .order("placed_at", { ascending: false });
+
+  if (investorId) query = query.eq("investor_id", investorId);
+
+  const { data: bids } = await query;
+
+  const formatted = (bids || []).map((b: any) => ({
+    id: b.id,
+    invoiceId: b.invoice_id,
+    invoiceNumber: b.invoices?.invoice_number,
+    buyerName: b.invoices?.buyer_name,
+    invoiceAmount: Number(b.invoices?.amount || 0),
+    dueDate: b.invoices?.due_date,
+    invoiceStatus: b.invoices?.status,
+    advanceAmount: Number(b.advance_amount),
+    annualYield: Number(b.annual_yield),
+    expectedReturn: Number(b.expected_return),
+    status: b.status,
+    placedAt: b.placed_at,
+  }));
+
+  return NextResponse.json({ success: true, bids: formatted });
 }

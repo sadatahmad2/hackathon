@@ -35,6 +35,17 @@ export default function InvoiceVerificationPage() {
     documentVerified: true,
   });
 
+  // Dynamic rating based on checklist
+  const checkedCount = Object.values(checklist).filter(Boolean).length;
+  const uncheckedCount = 5 - checkedCount;
+  const getRating = () => {
+    if (uncheckedCount === 0) return { stars: 5, tier: "AAA", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" };
+    if (uncheckedCount === 1) return { stars: 4, tier: "AA", color: "text-blue-600", bg: "bg-blue-50 border-blue-200" };
+    if (uncheckedCount === 2) return { stars: 3, tier: "A", color: "text-amber-600", bg: "bg-amber-50 border-amber-200" };
+    return { stars: 2, tier: "BBB", color: "text-rose-600", bg: "bg-rose-50 border-rose-200" };
+  };
+  const rating = getRating();
+
   const fetchInvoices = () => {
     fetch("/api/invoices")
       .then((res) => res.json())
@@ -65,11 +76,16 @@ export default function InvoiceVerificationPage() {
     try {
       const res = await fetch(`/api/invoices/${selectedInvoice.id}/verify`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ checklist }),
       });
       const data = await res.json();
 
       if (data.success) {
-        success("Invoice Verified & Approved!", "AI Risk Engine assigned AAA rating and created auction listing.");
+        success(
+          `Invoice Verified! ${data.stars}★ ${data.riskTier} Rating`,
+          `Checklist score: ${checkedCount}/5 → ${data.riskTier} assigned.`
+        );
         setSelectedInvoice(null);
         fetchInvoices();
       } else {
@@ -294,70 +310,48 @@ export default function InvoiceVerificationPage() {
 
               {/* Exact Verification Checklist from Prompt Section 10 */}
               <div className="p-5 bg-white rounded-2xl border border-slate-200 space-y-3">
-                <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">
-                  Verification Checklist
-                </h4>
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">
+                    Verification Checklist
+                  </h4>
+                  {/* Live Star Rating */}
+                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold ${rating.bg} ${rating.color}`}>
+                    <span className="text-base">
+                      {Array.from({ length: 5 }).map((_, i) =>
+                        i < rating.stars ? "★" : "☆"
+                      ).join("")}
+                    </span>
+                    <span>{rating.tier} Rating</span>
+                  </div>
+                </div>
 
                 <div className="space-y-2.5">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={checklist.invoiceNumberValid}
-                      onChange={(e) =>
-                        setChecklist({ ...checklist, invoiceNumberValid: e.target.checked })
-                      }
-                      className="w-4 h-4 rounded text-[#00C896] focus:ring-[#00C896]"
-                    />
-                    <span className="font-medium text-slate-700">✓ Invoice number valid</span>
-                  </label>
+                  {[
+                    { key: "invoiceNumberValid" as const, label: "Invoice number valid" },
+                    { key: "buyerDetailsMatched" as const, label: "Buyer details matched (GST Portal 2B)" },
+                    { key: "amountVerified" as const, label: "Amount verified against PO" },
+                    { key: "dueDateValid" as const, label: "Due date valid (90-day trade window)" },
+                    { key: "documentVerified" as const, label: "Document verified & delivery proof attached" },
+                  ].map(({ key, label }) => (
+                    <label key={key} className="flex items-center gap-3 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={checklist[key]}
+                        onChange={(e) => setChecklist({ ...checklist, [key]: e.target.checked })}
+                        className="w-4 h-4 rounded text-[#00C896] focus:ring-[#00C896]"
+                      />
+                      <span className={`font-medium transition-colors ${checklist[key] ? "text-slate-700" : "text-slate-400 line-through"}`}>
+                        {checklist[key] ? "✓" : "✗"} {label}
+                      </span>
+                    </label>
+                  ))}
+                </div>
 
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={checklist.buyerDetailsMatched}
-                      onChange={(e) =>
-                        setChecklist({ ...checklist, buyerDetailsMatched: e.target.checked })
-                      }
-                      className="w-4 h-4 rounded text-[#00C896] focus:ring-[#00C896]"
-                    />
-                    <span className="font-medium text-slate-700">✓ Buyer details matched (GST Portal 2B)</span>
-                  </label>
-
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={checklist.amountVerified}
-                      onChange={(e) =>
-                        setChecklist({ ...checklist, amountVerified: e.target.checked })
-                      }
-                      className="w-4 h-4 rounded text-[#00C896] focus:ring-[#00C896]"
-                    />
-                    <span className="font-medium text-slate-700">✓ Amount verified against PO</span>
-                  </label>
-
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={checklist.dueDateValid}
-                      onChange={(e) =>
-                        setChecklist({ ...checklist, dueDateValid: e.target.checked })
-                      }
-                      className="w-4 h-4 rounded text-[#00C896] focus:ring-[#00C896]"
-                    />
-                    <span className="font-medium text-slate-700">✓ Due date valid (90-day trade window)</span>
-                  </label>
-
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={checklist.documentVerified}
-                      onChange={(e) =>
-                        setChecklist({ ...checklist, documentVerified: e.target.checked })
-                      }
-                      className="w-4 h-4 rounded text-[#00C896] focus:ring-[#00C896]"
-                    />
-                    <span className="font-medium text-slate-700">✓ Document verified & delivery proof attached</span>
-                  </label>
+                <div className="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-500">
+                  {checkedCount}/5 checks passed →
+                  <span className={`font-bold ml-1 ${rating.color}`}>
+                    {rating.stars}★ {rating.tier} will be assigned
+                  </span>
                 </div>
               </div>
 
@@ -384,7 +378,7 @@ export default function InvoiceVerificationPage() {
                     onClick={handleApprove}
                     className="rounded-xl px-6 font-bold"
                   >
-                    Approve & Verify (Assign AAA)
+                    Approve & Verify ({rating.stars}★ {rating.tier})
                   </Button>
                 </div>
               </div>

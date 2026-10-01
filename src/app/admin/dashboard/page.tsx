@@ -59,24 +59,28 @@ export default function AdminDashboardPage() {
   };
 
   const fetchPendingUsers = async () => {
-    const { data: users, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("verification_status", "PENDING");
-    
-    if (users) {
-      setPendingUsers(users);
+    try {
+      const res = await fetch("/api/admin/users");
+      const result = await res.json();
+      if (result.success && result.users) {
+        const pending = result.users.filter((u: any) => u.verification_status === "PENDING");
+        setPendingUsers(pending);
+      }
+    } catch (err) {
+      console.error("Failed to fetch pending users", err);
     }
   };
 
   const handleApproveUser = async (userId: string) => {
     try {
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ verification_status: "VERIFIED" })
-        .eq("id", userId);
+      const res = await fetch("/api/admin/users/approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, status: "VERIFIED" }),
+      });
+      const data = await res.json();
 
-      if (updateError) throw updateError;
+      if (!data.success) throw new Error(data.error);
       
       success("User Approved", "The user can now access their dashboard.");
       fetchPendingUsers();

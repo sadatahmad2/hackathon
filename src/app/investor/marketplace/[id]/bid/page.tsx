@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/Toast";
+import { useAuth } from "@/lib/AuthContext";
+import { supabase } from "@/lib/supabase";
 import { Invoice } from "@/types";
 import confetti from "canvas-confetti";
 import {
@@ -30,8 +32,10 @@ export default function PlaceBidPage({
   const resolvedParams = use(params);
   const router = useRouter();
   const { success, error } = useToast();
+  const { session } = useAuth();
 
   const [invoice, setInvoice] = useState<Invoice | null>(null);
+  const [investorName, setInvestorName] = useState<string>("Investor");
   const [advanceAmount, setAdvanceAmount] = useState<string>("460000");
   const [annualYield, setAnnualYield] = useState<string>("8.0");
   const [loading, setLoading] = useState(true);
@@ -39,6 +43,7 @@ export default function PlaceBidPage({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    // Fetch invoice
     fetch(`/api/invoices/${resolvedParams.id}`)
       .then((res) => res.json())
       .then((data) => {
@@ -52,7 +57,21 @@ export default function PlaceBidPage({
         }
       })
       .finally(() => setLoading(false));
-  }, [resolvedParams.id]);
+
+    // Fetch investor name from profile
+    if (session?.user?.id) {
+      supabase
+        .from("profiles")
+        .select("name, company_name")
+        .eq("id", session.user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setInvestorName(data.company_name || data.name || "Investor");
+          }
+        });
+    }
+  }, [resolvedParams.id, session?.user?.id]);
 
   const numAdvance = Number(advanceAmount) || 460000;
   const invoiceValue = invoice?.amount || 500000;
@@ -64,13 +83,20 @@ export default function PlaceBidPage({
     setIsSubmitting(true);
 
     try {
+      if (!session?.user?.id) {
+        error("Not logged in", "Please log in to place a bid.");
+        setIsSubmitting(false);
+        return;
+      }
+
       const res = await fetch(`/api/auctions/${invoice.id}/bids`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          investorId: session.user.id,
+          investorName: investorName,
           advanceAmount: numAdvance,
           annualYield: Number(annualYield),
-          investorName: "Growth Fund (Aman Sharma)",
         }),
       });
 

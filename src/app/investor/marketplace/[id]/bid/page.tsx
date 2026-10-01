@@ -78,6 +78,13 @@ export default function PlaceBidPage({
   const expectedReturn = Math.max(0, invoiceValue - numAdvance);
   const investmentPeriodDays = invoice?.tenureDays || 90;
 
+  const handlePercentageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const p = parseFloat(e.target.value);
+    if (!isNaN(p) && p >= 0 && p <= 100) {
+      setAdvanceAmount(String(Math.round((p / 100) * invoiceValue)));
+    }
+  };
+
   const handleConfirmBid = async () => {
     if (!invoice) return;
     setIsSubmitting(true);
@@ -208,7 +215,7 @@ export default function PlaceBidPage({
 
         {/* Bidding Form Card (Matching Screen 9) */}
         <div className="bg-white rounded-3xl p-8 border border-slate-200/90 shadow-sm space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Advance Amount (₹) <span className="text-rose-500">*</span>
@@ -221,11 +228,28 @@ export default function PlaceBidPage({
                 className="w-full px-4 py-3 text-base font-bold bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00C896]/40 focus:border-[#00C896] text-[#0B1720]"
               />
               <span className="text-xs text-slate-400 mt-1 block">
-                You will invest this amount now ({((numAdvance / invoice.amount) * 100).toFixed(1)}% Advance)
+                You will invest this amount now
               </span>
             </div>
 
             <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Advance % <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                value={invoiceValue > 0 ? ((numAdvance / invoiceValue) * 100).toFixed(1) : "0"}
+                onChange={handlePercentageChange}
+                placeholder="e.g. 92.0"
+                className="w-full px-4 py-3 text-base font-bold bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00C896]/40 focus:border-[#00C896] text-[#0B1720]"
+              />
+              <span className="text-xs text-slate-400 mt-1 block">
+                Percentage of invoice value
+              </span>
+            </div>
+
+            <div className="sm:col-span-2 lg:col-span-1">
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Expected Yield (% p.a.) <span className="text-rose-500">*</span>
               </label>

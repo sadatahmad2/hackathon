@@ -25,12 +25,11 @@ export default function InvestorMarketplacePage() {
   const [selectedTenure, setSelectedTenure] = useState("ALL");
 
   useEffect(() => {
-    fetch("/api/invoices")
+    fetch("/api/auctions")
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          // Filter to only verified / active auction invoices
-          setInvoices(data.invoices.filter((i: Invoice) => i.status === "Verified" || i.status === "Active Auction" || i.status === "Funded"));
+          setInvoices(data.invoices);
         }
       });
   }, []);
@@ -189,7 +188,7 @@ export default function InvestorMarketplacePage() {
               <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row items-start sm:items-center md:items-end lg:items-center justify-between gap-4 border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-8">
                 <div className="text-left md:text-right">
                   <div className="text-2xl font-black text-emerald-700">
-                    {inv.bestBidYield || (inv.riskTier === "AAA" ? "8.5%" : inv.riskTier === "AA" ? "10.5%" : inv.riskTier === "A" ? "12%" : "9.5%")}
+                    {inv.bestBidYield ? `${inv.bestBidYield}%` : (inv.riskTier === "AAA" ? "8.5%" : inv.riskTier === "AA" ? "10.5%" : inv.riskTier === "A" ? "12%" : "9.5%")}
                   </div>
                   <span className="text-[11px] font-medium text-slate-500">
                     Est. Annual Yield

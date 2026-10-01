@@ -267,6 +267,26 @@ export default function PlaceBidPage({
             </div>
           </div>
 
+          {/* Range Slider for Advance Percentage */}
+          <div className="px-2 pt-2 pb-4 border-b border-slate-100">
+            <div className="flex justify-between text-xs text-slate-500 mb-3 font-medium">
+              <span>10%</span>
+              <span className="font-bold text-[#00C896] bg-[#00C896]/10 px-2.5 py-1 rounded-md">
+                {invoiceValue > 0 ? ((numAdvance / invoiceValue) * 100).toFixed(1) : "0"}% Advance
+              </span>
+              <span>100%</span>
+            </div>
+            <input
+              type="range"
+              min="10"
+              max="100"
+              step="0.1"
+              value={invoiceValue > 0 ? ((numAdvance / invoiceValue) * 100).toFixed(1) : "0"}
+              onChange={handlePercentageChange}
+              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#00C896]"
+            />
+          </div>
+
           {/* Three Summary Calculation Cards (Matching Screen 9) */}
           <div className="grid grid-cols-3 gap-4 pt-2">
             <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80">

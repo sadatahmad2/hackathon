@@ -81,24 +81,27 @@ export async function POST(
 
     if (bidError) throw bidError;
 
-    // Update invoice best bid info and bids count
+    // Update invoice best bid info
     await supabase
       .from("invoices")
       .update({
         best_bid_amount: Number(advanceAmount),
         best_bid_yield: Number(annualYield),
         best_bid_id: newBid.id,
-        bids_count: supabase.rpc ? undefined : undefined, // increment handled separately
       })
       .eq("id", invoiceId);
 
-    // Increment bids_count
-    await supabase.rpc("increment_bids_count", { invoice_id: invoiceId }).catch(() => {
-      // If RPC doesn't exist, do manual increment
-      supabase.from("invoices").select("bids_count").eq("id", invoiceId).single().then(({ data }) => {
-        supabase.from("invoices").update({ bids_count: (data?.bids_count || 0) + 1 }).eq("id", invoiceId);
-      });
-    });
+    // Manually increment bids_count
+    const { data: invData } = await supabase
+      .from("invoices")
+      .select("bids_count")
+      .eq("id", invoiceId)
+      .single();
+    
+    await supabase
+      .from("invoices")
+      .update({ bids_count: (invData?.bids_count || 0) + 1 })
+      .eq("id", invoiceId);
 
     return NextResponse.json({ success: true, bid: newBid }, { status: 201 });
   } catch (error: any) {
